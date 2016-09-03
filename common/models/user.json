@@ -1,0 +1,32 @@
+{
+  "name": "user",
+  "base": "User",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "username": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "string",
+      "required": false
+    }
+  },
+  "scope": {
+    "fields": ["username", "id", "password"]
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [  
+    {
+      "accessType": "READ",
+      "permission": "ALLOW",
+      "principalType": "ROLE",
+      "principalId": "admin"
+    }
+  ],
+  "methods": {}
+}
