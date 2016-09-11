@@ -6,9 +6,9 @@
   "accountDS": {
     "host": "localhost",
     "port": 3306,
-    "database": "cliplay_dev",
+    "database": "loopback-example-mysql",
     "username": "root",
-    "password": "983715",
+    "password": "",
     "name": "accountDS",
     "connector": "mysql"
   }

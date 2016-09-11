@@ -59,7 +59,7 @@ module.exports = function(Client) {
 				lastUpdated: Date.now()
 			}, 
 			function(err, info) {
-		    	if(!err) console.log(info.count + " records updated");
+		    	// if(!err) console.log(info.count + " records updated");
 			}
 		);
 	}

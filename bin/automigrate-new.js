@@ -8,10 +8,10 @@ var ds = app.datasources.accountDS;
 //   ds.disconnect();
 // });
 
-// ds.autoupdate('post', function(err) {
-//   if (err) throw err;
-//   ds.disconnect();
-// });
+ds.autoupdate('post', function(err) {
+  if (err) throw err;
+  ds.disconnect();
+});
 
 // ds.autoupdate('user', function(err) {
 //   if (err) throw err;
@@ -23,7 +23,12 @@ var ds = app.datasources.accountDS;
 //   ds.disconnect();
 // });
 
-ds.autoupdate('AccessToken', function(err) {
-  if (err) throw err;
-  ds.disconnect();
-});
+// ds.autoupdate('AccessToken', function(err) {
+//   if (err) throw err;
+//   ds.disconnect();
+// });
+
+// ds.autoupdate('visit', function(err) {
+//   if (err) throw err;
+//   ds.disconnect();
+// });

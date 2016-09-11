@@ -1,6 +1,6 @@
 {
   "name": "cliplay-backend",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "main": "server/server.js",
   "scripts": {
     "pretest": "jshint .",
@@ -8,14 +8,16 @@
     "test": "tape test/*.js"
   },
   "dependencies": {
+    "blueimp-md5": "^2.3.1",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "loopback": "^2.22.0",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^2.1.0",
     "loopback-connector-mysql": "^2.2.0",
-    "loopback-counts-mixin": "^1.0.0",
+    "loopback-context": "^1.0.0",
     "loopback-datasource-juggler": "^2.39.0",
+    "moment": "^2.14.1",
     "serve-favicon": "^2.0.1"
   },
   "devDependencies": {

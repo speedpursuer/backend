@@ -40,5 +40,9 @@
   "client": {
     "dataSource": "accountDS",
     "public": true
+  },
+  "visit": {
+    "dataSource": "accountDS",
+    "public": true
   }
 }

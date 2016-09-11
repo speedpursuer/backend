@@ -5,6 +5,14 @@
   "options": {
     "validateUpsert": true
   },
+  "scope": {
+    "fields": [
+      "time",
+      "text",
+      "author",
+      "id_user"
+    ]
+  },
   "properties": {
     "id_clip": {
       "type": "string",
@@ -31,9 +39,6 @@
       "model": "client",
       "foreignKey": "id_user"
     }
-  },
-  "scope": {
-    "fields": ["time", "text", "author", "id_user"]
   },
   "acls": [
     {

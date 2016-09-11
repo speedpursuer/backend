@@ -1,53 +1,26 @@
 var loopback = require('loopback');
 
 module.exports = function(Comment) {
-	// Comment.updateCommentQty = function(id_clip, qty, cb) {		
-
-	// 	console.log('id_clip is ' + id_clip);
-
-	// 	Post.updateAll({id_clip: id_clip}, {comment_quantity: qty}, function(err, info) {
-	// 		if (err) return cb(err);
-	// 		console.log('count of record updated' + info.count);			
-	// 		cb(null, info.count);
-	// 	});		
- //  	};
-
- //  	Comment.remoteMethod(
- //    	'getCommentQty',
- //    	{
- //    		accepts: {arg: 'id_post', type: 'string', required: true},
- //      		http: {path: '/commentQty', verb: 'get'},
-	// 	    returns: {arg: 'commentQtyList', type: 'Array'}
-	// 	}
-	// );
-
-	Comment.beforeRemote('create', function(context, comment, next) {
-		// console.log('id_clip of the newly created comment = ' + comment.id_clip);
-
-		// var d = new Date();
-
-		// console.log('local time = ' + d.toLocaleString());
+	
+	Comment.beforeRemote('create', function(context, comment, next) {		
 
 		context.args.data.id_user = context.req.accessToken.userId;
-
 		context.args.data.time = Date.now();		
 
 		next();
 	});
 
-	Comment.afterRemote('create', function(context, comment, next) {
-		// console.log('id_clip of the newly created comment = ' + comment.id_clip);
+	// Comment.afterRemote('create', function(context, comment, next) {
 		
-		Comment.count({id_clip: comment.id_clip}, function(err, count) {
-			if (err) return cb(err);
-			// console.log('count of comments for the clip (id = ' + comment.id_clip + ') = ' + count);			
+	// 	Comment.count({id_clip: comment.id_clip}, function(err, count) {
+	// 		if (err) return cb(err);			
 
-			var Post = Comment.app.models.post;
+	// 		var Post = Comment.app.models.post;
 
-			Post.updateCommentQty(comment.id_clip, count, next());
+	// 		Post.updateCommentQty(comment.id_clip, count, next());
 
-		});				
-	});
+	// 	});				
+	// });
 
 	Comment.getComments = function(id_clip, limit, skip, cb) {		
 

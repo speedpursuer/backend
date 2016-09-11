@@ -5,6 +5,12 @@
   "options": {
     "validateUpsert": true
   },
+  "scope": {
+    "fields": [
+      "id_post",
+      "id_clip"
+    ]
+  },
   "properties": {
     "id_clip": {
       "type": "string",
@@ -14,14 +20,10 @@
       "type": "string",
       "required": true
     },
-    "comment_quantity": {
-      "type": "number",
-      "required": true,
-      "default": "0"
+    "key_clip": {
+      "type": "string",
+      "required": true
     }
-  },
-  "scope": {
-    "fields": ["id_clip", "comment_quantity"]
   },
   "validations": [],
   "relations": {},

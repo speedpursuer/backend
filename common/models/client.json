@@ -5,6 +5,14 @@
   "options": {
     "validateUpsert": true
   },
+  "scope": {
+    "fields": [
+      "name",
+      "avatar",
+      "id",
+      "password"
+    ]
+  },
   "properties": {
     "platform": {
       "type": "string",
@@ -21,10 +29,7 @@
     "avatar": {
       "type": "string",
       "default": "http://ww3.sinaimg.cn/mw690/006p1Rrsgw1f660b2nbo3j306y06yt8r.jpg"
-    }    
-  },
-  "scope": {
-    "fields": ["name", "avatar", "id", "password"]
+    }
   },
   "validations": [],
   "relations": {},

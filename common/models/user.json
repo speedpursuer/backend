@@ -5,6 +5,13 @@
   "options": {
     "validateUpsert": true
   },
+  "scope": {
+    "fields": [
+      "username",
+      "id",
+      "password"
+    ]
+  },
   "properties": {
     "username": {
       "type": "string",
@@ -15,17 +22,14 @@
       "required": false
     }
   },
-  "scope": {
-    "fields": ["username", "id", "password"]
-  },
   "validations": [],
   "relations": {},
-  "acls": [  
+  "acls": [
     {
       "accessType": "READ",
-      "permission": "ALLOW",
       "principalType": "ROLE",
-      "principalId": "admin"
+      "principalId": "admin",
+      "permission": "ALLOW"
     }
   ],
   "methods": {}
