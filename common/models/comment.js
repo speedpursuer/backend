@@ -1,30 +1,28 @@
-var loopback = require('loopback');
-
 module.exports = function(Comment) {
 	
-	Comment.beforeRemote('create', function(context, comment, next) {		
+	Comment.beforeRemote('create', function(context, comment, next) {
 
-		context.args.data.id_user = context.req.accessToken.userId;
-		context.args.data.time = Date.now();		
+		//Only logged-in user can call this function, so userID is always available
+		var userID = context.req.accessToken && context.req.accessToken.userId;
+		
+		Comment.app.models.client.findById(userID, function(err, user) { 
+			if (err) {
+		      	return next(err);
+		    }		    
 
-		next();
+		    if (user.locked) {
+		    	var err = new Error('User disabled');
+				err.status = 801;
+		      	return next(err);
+		    }
+		    
+		    context.args.data.id_user = userID;
+			context.args.data.time = Date.now();				    
+		    next();
+		});
 	});
 
-	// Comment.afterRemote('create', function(context, comment, next) {
-		
-	// 	Comment.count({id_clip: comment.id_clip}, function(err, count) {
-	// 		if (err) return cb(err);			
-
-	// 		var Post = Comment.app.models.post;
-
-	// 		Post.updateCommentQty(comment.id_clip, count, next());
-
-	// 	});				
-	// });
-
 	Comment.getComments = function(id_clip, limit, skip, cb) {		
-
-		// console.log('id_clip is ' + id_clip);
 
 		var filter = {where: {id_clip: id_clip}, include: "author", order: "id DESC"};
 
@@ -33,12 +31,8 @@ module.exports = function(Comment) {
 			filter.skip = skip;
 		}
 
-		Comment.find(filter, function(err, data) {
-			if(err) console.log('Err is ' + err);
-			// console.log('Data length is ' + data.length);
-			// console.log('where is ' + JSON.stringify(filter));
-			// console.log('typeof data is ' + typeof(data));
-			// response = data;
+		Comment.find(filter, function(err, data) {			
+			if(err) cb(err);
 			cb(null, data);
 		});		
   	};

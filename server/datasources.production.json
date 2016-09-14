@@ -1,0 +1,15 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "accountDS": {
+    "host": "10.162.56.242",
+    "port": 3306,
+    "database": "cliplay_dev",
+    "username": "cliplay_user",
+    "password": "Hello1234",
+    "name": "accountDS",
+    "connector": "mysql"
+  }
+}

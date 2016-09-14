@@ -10,7 +10,8 @@
       "name",
       "avatar",
       "id",
-      "password"
+      "password",
+      "locked"
     ]
   },
   "properties": {
@@ -29,6 +30,10 @@
     "avatar": {
       "type": "string",
       "default": "http://ww3.sinaimg.cn/mw690/006p1Rrsgw1f660b2nbo3j306y06yt8r.jpg"
+    },
+    "locked": {
+      "type": "boolean",
+      "default": false
     }
   },
   "validations": [],

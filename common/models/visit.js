@@ -8,16 +8,29 @@ var TYPE = {
 
 module.exports = function(Visit) {
 
-	// Visit.beforeRemote('create', function(context, comment, next) {
-	// 	context.args.data.id_user = context.req.accessToken.userId;
-	// 	context.args.data.time = Date.now();
-	// 	next();
-	// });
+	Visit.beforeRemote('shareClip', function(ctx, unused, next) {
 
-	Visit.shareClip = function(id_clip, cb) {
+		//Only logged-in user can call this function, so userID is always available
+		var userID = ctx.req.accessToken && ctx.req.accessToken.userId;
+		
+		Visit.app.models.client.findById(userID, function(err, user) { 
+			if (err) {
+		      	return next(err);
+		    }		    
+
+		    if (user.locked) {
+		    	var err = new Error('User disabled');
+				err.status = 801;
+		      	return next(err);
+		    }		    
+		    next();
+		});
+	});
+
+	Visit.shareClip = function(id_clip, cb) {		
 
 		var ctx = LoopBackContext.getCurrentContext();
-  		var accessToken = ctx && ctx.get('accessToken');  
+  		var accessToken = ctx && ctx.get('accessToken');
   		var userID = accessToken && accessToken.userId;
 
 		if(!userID) {			
@@ -37,8 +50,10 @@ module.exports = function(Visit) {
 
 		Visit.find({where: where})
 		.then(function(data){
-			if(data.length > DAILY_LIMIT) {
-				throw new Error("Excceed share limit");
+			if(data.length > DAILY_LIMIT) {			
+				var err = new Error("Excceed share limit");
+				err.status = 804;
+				throw err;			
 			}else {
 				return true;
 			}			
@@ -56,7 +71,7 @@ module.exports = function(Visit) {
 			cb(null, true);
 		})	
 		.catch(function(err){
-			cb(null, false);
+			cb(err);
 		});	
   	};
 
