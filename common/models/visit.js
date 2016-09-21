@@ -8,24 +8,14 @@ var TYPE = {
 
 module.exports = function(Visit) {
 
-	Visit.beforeRemote('shareClip', function(ctx, unused, next) {
-
-		//Only logged-in user can call this function, so userID is always available
-		var userID = ctx.req.accessToken && ctx.req.accessToken.userId;
-		
-		Visit.app.models.client.findById(userID, function(err, user) { 
-			if (err) {
-		      	return next(err);
-		    }		    
-
-		    if (user.locked) {
-		    	var err = new Error('User disabled');
-				err.status = 801;
-		      	return next(err);
-		    }		    
-		    next();
-		});
-	});
+	Visit.remoteMethod(
+    	'shareClip',
+    	{
+    		accepts: {arg: 'id_clip', type: 'string', required: true},
+      		http: {path: '/shareClip', verb: 'post'},
+		    returns: {arg: 'result', type: 'boolean'}
+		}
+	);
 
 	Visit.shareClip = function(id_clip, cb) {		
 
@@ -75,12 +65,22 @@ module.exports = function(Visit) {
 		});	
   	};
 
-	Visit.remoteMethod(
-    	'shareClip',
-    	{
-    		accepts: {arg: 'id_clip', type: 'string', required: true},
-      		http: {path: '/shareClip', verb: 'post'},
-		    returns: {arg: 'result', type: 'boolean'}
-		}
-	);
+  	Visit.beforeRemote('shareClip', function(ctx, unused, next) {
+
+		//Only logged-in user can call this function, so userID is always available
+		var userID = ctx.req.accessToken && ctx.req.accessToken.userId;
+		
+		Visit.app.models.client.findById(userID, function(err, user) { 
+			if (err) {
+		      	return next(err);
+		    }		    
+
+		    if (user.locked) {
+		    	var err = new Error('User disabled');
+				err.status = 801;
+		      	return next(err);
+		    }		    
+		    next();
+		});
+	});
 };

@@ -1,6 +1,34 @@
 var md5 = require("blueimp-md5");
 
 module.exports = function(Post) {
+	
+	Post.remoteMethod(
+    	'getCommentQty',
+    	{
+    		accepts: {arg: 'id_post', type: 'string', required: true},
+      		http: {path: '/getCommentQty', verb: 'post'},
+		    returns: {arg: 'commentQtyList', type: 'array'}
+		}
+	);
+
+	Post.remoteMethod(
+    	'getCommentQtyByClips',
+    	{
+    		accepts: {arg: 'clips', type: 'array', required: true},
+      		http: {path: '/getCommentQtyByClips', verb: 'post'},
+		    returns: {arg: 'commentQtyList', type: 'array'}
+		}
+	);
+
+	Post.remoteMethod(
+    	'updatePostClip',
+    	{
+    		accepts: {arg: 'postData', type: 'array', required: true},
+      		http: {path: '/updatePostClip', verb: 'post'},
+		    returns: {arg: 'result', type: 'boolean'}
+		}
+	);
+	
 	Post.getCommentQty = function(id_post, cb) {		
 				
 		var dataSource = Post.app.datasources.accountDS;		
@@ -69,34 +97,6 @@ module.exports = function(Post) {
 			cb(null, true);
 		});
   	};
-
-
-  	Post.remoteMethod(
-    	'getCommentQty',
-    	{
-    		accepts: {arg: 'id_post', type: 'string', required: true},
-      		http: {path: '/getCommentQty', verb: 'post'},
-		    returns: {arg: 'commentQtyList', type: 'array'}
-		}
-	);
-
-	Post.remoteMethod(
-    	'getCommentQtyByClips',
-    	{
-    		accepts: {arg: 'clips', type: 'array', required: true},
-      		http: {path: '/getCommentQtyByClips', verb: 'post'},
-		    returns: {arg: 'commentQtyList', type: 'array'}
-		}
-	);
-
-	Post.remoteMethod(
-    	'updatePostClip',
-    	{
-    		accepts: {arg: 'postData', type: 'array', required: true},
-      		http: {path: '/updatePostClip', verb: 'post'},
-		    returns: {arg: 'result', type: 'boolean'}
-		}
-	);
 
 	// 	Post.updatePostClip = function(postData, cb) {
 

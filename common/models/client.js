@@ -1,15 +1,18 @@
 module.exports = function(Client) {
 
-	function convertClient(platform, openID) {
-		var uid = platform + '-' + openID;
-
-		var client = {
-			email: uid + '@cliplay.com',
-			password: uid,
+	Client.remoteMethod(
+    	'register',
+    	{
+    		accepts: [
+    					{arg: 'platform', type: 'string', required: true},
+    					{arg: 'openID', type: 'string', required: true},
+    					{arg: 'name', type: 'string', required: true},
+    					{arg: 'avatar', type: 'string'},
+    				 ],
+      		http: {path: '/register', verb: 'post'},
+		    returns: {arg: 'accesstoken', type: 'string'}
 		}
-
-		return client;
-	}
+	);
 
   	Client.register = function(platform, openID, name, avatar, cb) {		
 
@@ -58,19 +61,16 @@ module.exports = function(Client) {
 		});		
   	};
 
-  	Client.remoteMethod(
-    	'register',
-    	{
-    		accepts: [
-    					{arg: 'platform', type: 'string', required: true},
-    					{arg: 'openID', type: 'string', required: true},
-    					{arg: 'name', type: 'string', required: true},
-    					{arg: 'avatar', type: 'string'},
-    				 ],
-      		http: {path: '/register', verb: 'post'},
-		    returns: {arg: 'accesstoken', type: 'string'}
+  	function convertClient(platform, openID) {
+		var uid = platform + '-' + openID;
+
+		var client = {
+			email: uid + '@cliplay.com',
+			password: uid,
 		}
-	);
+
+		return client;
+	}
 
  //  	function login(client, cb) {
 
