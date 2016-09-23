@@ -1,7 +1,7 @@
 var moment = require('moment');
 var LoopBackContext = require('loopback-context');
 
-var DAILY_LIMIT = 4;
+var DAILY_LIMIT = 1;
 var TYPE = {
 	shareClip: "shareClip",
 };
@@ -11,7 +11,7 @@ module.exports = function(Visit) {
 	Visit.remoteMethod(
     	'shareClip',
     	{
-    		accepts: {arg: 'id_clip', type: 'string', required: true},
+    		accepts: {arg: 'id_clip', type: 'string', required: true},    		
       		http: {path: '/shareClip', verb: 'post'},
 		    returns: {arg: 'result', type: 'boolean'}
 		}
@@ -23,22 +23,41 @@ module.exports = function(Visit) {
   		var accessToken = ctx && ctx.get('accessToken');
   		var userID = accessToken && accessToken.userId;
 
-		if(!userID) {			
-			cb(null, false);
-		}
+  		var accountID = "";
 
-		var min = moment({hour: 0, minute: 0, seconds: 0, milliseconds: 0}).format("YYYY-MM-DD HH:mm:ss");
-		var max = moment({hour: 23, minute: 59, seconds: 59, milliseconds: 999}).format("YYYY-MM-DD HH:mm:ss");
+  		Visit.app.models.client.findById(userID)
+		.then(function(user) {
+			if (user.locked) {
+		    	var err = new Error('User disabled');
+				err.status = 801;
+		      	throw err;
+		    }
 
-		var where = {
-					   and: [
-					     { type: TYPE.shareClip },
-					     { id_user: userID },
-					     { time: { between: [min, max] } }
-					   ]
-					};
+			return Visit.app.models.account.find({where: {id_user: userID, type: "share"}});
+		})
+		.then(function(accounts) {
 
-		Visit.find({where: where})
+			if(accounts.length == 0) {
+				var err = new Error('Share account not exists');
+				err.status = 401;
+		      	throw err;
+			}
+
+			accountID = accounts[0].id;
+			return true;
+		}).then(function(accountID){
+			var min = moment({hour: 0, minute: 0, seconds: 0, milliseconds: 0}).format("YYYY-MM-DD HH:mm:ss");
+			var max = moment({hour: 23, minute: 59, seconds: 59, milliseconds: 999}).format("YYYY-MM-DD HH:mm:ss");
+
+			var where = {
+						   and: [
+						     { type: TYPE.shareClip },
+						     { id_user: userID },						     
+						     { time: { between: [min, max] } }
+						   ]
+						};
+			return Visit.find({where: where});
+		})
 		.then(function(data){
 			if(data.length > DAILY_LIMIT) {			
 				var err = new Error("Excceed share limit");
@@ -53,6 +72,7 @@ module.exports = function(Visit) {
 				type: TYPE.shareClip,
 				subject: id_clip,
 				id_user: userID,
+				id_account: accountID,
 				time: Date.now()
 			}
 			return Visit.create(newVisit);
@@ -65,22 +85,22 @@ module.exports = function(Visit) {
 		});	
   	};
 
-  	Visit.beforeRemote('shareClip', function(ctx, unused, next) {
+ //  	Visit.beforeRemote('shareClip', function(ctx, unused, next) {
 
-		//Only logged-in user can call this function, so userID is always available
-		var userID = ctx.req.accessToken && ctx.req.accessToken.userId;
+	// 	//Only logged-in user can call this function, so userID is always available
+	// 	var userID = ctx.req.accessToken && ctx.req.accessToken.userId;
 		
-		Visit.app.models.client.findById(userID, function(err, user) { 
-			if (err) {
-		      	return next(err);
-		    }		    
+	// 	Visit.app.models.client.findById(userID, function(err, user) { 
+	// 		if (err) {
+	// 	      	return next(err);
+	// 	    }		    
 
-		    if (user.locked) {
-		    	var err = new Error('User disabled');
-				err.status = 801;
-		      	return next(err);
-		    }		    
-		    next();
-		});
-	});
+	// 	    if (user.locked) {
+	// 	    	var err = new Error('User disabled');
+	// 			err.status = 801;
+	// 	      	return next(err);
+	// 	    }		    
+	// 	    next();
+	// 	});		
+	// });
 };

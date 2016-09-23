@@ -1,0 +1,46 @@
+{
+  "name": "account",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id_user": {
+      "type": "number",
+      "required": true
+    },
+    "type": {
+      "type": "string",
+      "required": true
+    },
+    "platform": {
+      "type": "string",
+      "required": true
+    },
+    "openID": {
+      "type": "string",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "avatar": {
+      "type": "string",
+      "required": false,
+      "default": "http://ww3.sinaimg.cn/mw690/006p1Rrsgw1f660b2nbo3j306y06yt8r.jpg"
+    }
+  },
+  "scope": {
+    "fields": [
+      "name",
+      "avatar",
+      "id"
+    ]
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

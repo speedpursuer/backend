@@ -32,21 +32,72 @@ module.exports = function(Comment) {
 
 		//Only logged-in user can call this function, so userID is always available
 		var userID = context.req.accessToken && context.req.accessToken.userId;
-		
-		Comment.app.models.client.findById(userID, function(err, user) { 
-			if (err) {
-		      	return next(err);
-		    }		    
 
-		    if (user.locked) {
+		Comment.app.models.client.findById(userID)
+		.then(function(user) {
+			if (user.locked) {
 		    	var err = new Error('User disabled');
 				err.status = 801;
-		      	return next(err);
+		      	throw err;
 		    }
-		    
-		    context.args.data.id_user = userID;
+
+			return Comment.app.models.account.find({where: {id_user: userID, type: "comment"}});
+		})
+		.then(function(accounts) {
+
+			if(accounts.length == 0) {
+				var err = new Error('Comment account not exists');
+				err.status = 401;
+		      	throw err;
+			}
+
+			context.args.data.id_account = accounts[0].id;
 			context.args.data.time = Date.now();				    
-		    next();
+			next();
+		})	
+		.catch(function(err){
+			return next(err);
 		});
+
+		// Comment.app.models.client.findById(userID, function(err, user) { 
+		// 	if (err) {
+		//       	return next(err);
+		//     }		    
+
+		//     if (user.locked) {
+		//     	var err = new Error('User disabled');
+		// 		err.status = 801;
+		//       	return next(err);
+		//     }
+
+		//     Comment.app.models.account.find({where: {id_user: userId, type: "comment"}}, function(err, user) {
+						    
+		// 	    context.args.data.id_account = user[0].id;
+		// 		context.args.data.time = Date.now();				    
+		// 	    next();
+		// 	});
+		// });		
 	});
+
+ //  	Comment.beforeRemote('create', function(context, comment, next) {
+
+	// 	//Only logged-in user can call this function, so userID is always available
+	// 	var userID = context.req.accessToken && context.req.accessToken.userId;
+		
+	// 	Comment.app.models.client.findById(userID, function(err, user) { 
+	// 		if (err) {
+	// 	      	return next(err);
+	// 	    }		    
+
+	// 	    if (user.locked) {
+	// 	    	var err = new Error('User disabled');
+	// 			err.status = 801;
+	// 	      	return next(err);
+	// 	    }
+		    
+	// 	    context.args.data.id_user = userID;
+	// 		context.args.data.time = Date.now();				    
+	// 	    next();
+	// 	});
+	// });
 };

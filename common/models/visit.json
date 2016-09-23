@@ -17,6 +17,10 @@
       "type": "string",
       "required": true
     },
+    "id_account": {
+      "type": "string",
+      "required": true
+    },
     "time": {
       "type": "date",
       "required": true
@@ -35,9 +39,8 @@
       "accessType": "EXECUTE",
       "principalType": "ROLE",
       "principalId": "$authenticated",
-      "permission": "ALLOW",
-      "property": "shareClip"
-    }    
+      "permission": "ALLOW"
+    }
   ],
   "methods": {}
 }

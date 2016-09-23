@@ -1,44 +1,46 @@
+var loopback = require('loopback-context');
+
 module.exports = function(Client) {
 
 	Client.remoteMethod(
     	'register',
     	{
-    		accepts: [
-    					{arg: 'platform', type: 'string', required: true},
-    					{arg: 'openID', type: 'string', required: true},
-    					{arg: 'name', type: 'string', required: true},
-    					{arg: 'avatar', type: 'string'},
-    				 ],
+    		accepts: {arg: 'uuid', type: 'string', required: true},
       		http: {path: '/register', verb: 'post'},
 		    returns: {arg: 'accesstoken', type: 'string'}
 		}
 	);
 
-  	Client.register = function(platform, openID, name, avatar, cb) {		
+	Client.remoteMethod(
+    	'addAccount',
+    	{
+    		accepts: [
+    					{arg: 'type', type: 'string', required: true},
+    					{arg: 'platform', type: 'string', required: true},
+    					{arg: 'openID', type: 'string', required: true},
+    					{arg: 'name', type: 'string', required: true},
+    					{arg: 'avatar', type: 'string'},
+    				 ],
+      		http: {path: '/addAccount', verb: 'post'},
+		    returns: {arg: 'result', type: 'boolean'}
+		}
+	);
 
-		var client = convertClient(platform, openID);
+  	Client.register = function(uuid, cb) {	
 
-		Client.find({where: {platform: platform, openID: openID}})
+		var client = convertClient(uuid);
+
+		Client.find({where: {email: client.email}})
 		.then(function(data) {
 			var now = Date.now();
 
 			if(data.length > 0) {									
-				return Client.updateAll(
-					{email: client.email}, 
-					{
-						name: name,
-						avatar: avatar,
-						lastUpdated: now
-					}
-				);									
+				return true;								
 			}else {				
-				return Client.create({
-					platform: platform, 
-					openID: openID, 
+				return Client.create({					
+					uuid: uuid,
 					email: client.email, 
-					password: client.password,
-					name: name,
-					avatar: avatar,
+					password: client.password,					
 					created: now,
 					lastUpdated: now					
 				});				
@@ -61,16 +63,79 @@ module.exports = function(Client) {
 		});		
   	};
 
-  	function convertClient(platform, openID) {
-		var uid = platform + '-' + openID;
+  	Client.addAccount = function(type, platform, openID, name, avatar, cb) {
+
+		var userId = getCurrentUserId();
+
+		var Account = Client.app.models.account;
+
+		Account.find({where: {id_user: userId, type: type}})
+		.then(function(data) {
+			var now = Date.now();
+
+			if(data.length > 0) {									
+				return Account.updateAll(
+					{id: data[0].id}, 
+					{
+						platform: platform,
+						openID: openID,
+						name: name,
+						avatar: avatar,
+						lastUpdated: now
+					}
+				);									
+			}else {				
+				return Account.create({
+					id_user: userId,
+					type: type,
+					platform: platform, 
+					openID: openID, 					
+					name: name,
+					avatar: avatar,
+					created: now,
+					lastUpdated: now					
+				});				
+			}
+		})
+		.then(function(info) {
+			cb(null, true);
+		})		
+		.catch(function(err) {
+			cb(err);
+		});		
+  	};
+
+	function getCurrentUserId() {
+	    var ctx = loopback.getCurrentContext();
+	    var accessToken = ctx && ctx.get('accessToken');
+	    var userId = accessToken && accessToken.userId;
+	    return userId;
+	}
+
+  	function convertClient(uuid) {
 
 		var client = {
-			email: uid + '@cliplay.com',
-			password: uid,
+			email: uuid + '@cliplay.com',
+			password: uuid,
 		}
 
 		return client;
 	}
+
+	// Client.remoteMethod(
+ //    	'test',
+ //    	{
+ //    		accepts: {arg: 'id', type: 'string', required: true},
+ //      		http: {path: '/test', verb: 'post'},
+	// 	    returns: {arg: 'accesstoken', type: 'string'}
+	// 	}
+	// );
+
+	// Client.test = function(uuid, cb) {	
+	// 	var userId = getCurrentUserId();
+	// 	console.log(userId);
+	// 	cb(null, userId);
+	// };
 
  //  	function login(client, cb) {
 
