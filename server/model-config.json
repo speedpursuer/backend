@@ -48,5 +48,9 @@
   "account": {
     "dataSource": "accountDS",
     "public": true
+  },
+  "favorite": {
+    "dataSource": "accountDS",
+    "public": true
   }
 }

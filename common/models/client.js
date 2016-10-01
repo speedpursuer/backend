@@ -1,4 +1,5 @@
 var loopback = require('loopback-context');
+var md5 = require("blueimp-md5");
 
 module.exports = function(Client) {
 
@@ -22,7 +23,7 @@ module.exports = function(Client) {
     					{arg: 'avatar', type: 'string'},
     				 ],
       		http: {path: '/addAccount', verb: 'post'},
-		    returns: {arg: 'result', type: 'boolean'}
+		    returns: {arg: 'accountID', type: 'string'}
 		}
 	);
 
@@ -32,7 +33,6 @@ module.exports = function(Client) {
 
 		Client.find({where: {email: client.email}})
 		.then(function(data) {
-			var now = Date.now();
 
 			if(data.length > 0) {									
 				return true;								
@@ -41,8 +41,7 @@ module.exports = function(Client) {
 					uuid: uuid,
 					email: client.email, 
 					password: client.password,					
-					created: now,
-					lastUpdated: now					
+					created: Date.now(),	
 				});				
 			}
 		})
@@ -69,23 +68,24 @@ module.exports = function(Client) {
 
 		var Account = Client.app.models.account;
 
-		Account.find({where: {id_user: userId, type: type}})
+		var accountID = md5(platform+openID);
+
+		Account.findById(accountID)
 		.then(function(data) {
 			var now = Date.now();
 
-			if(data.length > 0) {									
+			if(data) {
 				return Account.updateAll(
-					{id: data[0].id}, 
-					{
-						platform: platform,
-						openID: openID,
+					{id: accountID}, 
+					{						
 						name: name,
 						avatar: avatar,
 						lastUpdated: now
 					}
-				);									
-			}else {				
+				);
+			}else{
 				return Account.create({
+					id: accountID,
 					id_user: userId,
 					type: type,
 					platform: platform, 
@@ -93,12 +93,36 @@ module.exports = function(Client) {
 					name: name,
 					avatar: avatar,
 					created: now,
-					lastUpdated: now					
-				});				
+					lastUpdated: now			
+				});
 			}
+
+			// if(data.length > 0) {									
+			// 	return Account.updateAll(
+			// 		{id: data[0].id}, 
+			// 		{
+			// 			platform: platform,
+			// 			openID: openID,
+			// 			name: name,
+			// 			avatar: avatar,
+			// 			lastUpdated: now
+			// 		}
+			// 	);									
+			// }else {				
+			// 	return Account.create({
+			// 		id_user: userId,
+			// 		type: type,
+			// 		platform: platform, 
+			// 		openID: openID, 					
+			// 		name: name,
+			// 		avatar: avatar,
+			// 		created: now,
+			// 		lastUpdated: now					
+			// 	});				
+			// }
 		})
 		.then(function(info) {
-			cb(null, true);
+			cb(null, accountID);
 		})		
 		.catch(function(err) {
 			cb(err);

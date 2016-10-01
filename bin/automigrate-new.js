@@ -37,3 +37,7 @@ var ds = app.datasources.accountDS;
 //   if (err) throw err;
 //   ds.disconnect();
 // });
+ds.autoupdate('favorite', function(err) {
+  if (err) throw err;
+  ds.disconnect();
+});

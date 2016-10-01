@@ -1,0 +1,30 @@
+{
+  "name": "favorite",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id_user": {
+      "type": "number",
+      "required": true
+    },
+    "id_clip": {
+      "type": "string",
+      "required": true
+    },
+    "id_post": {
+      "type": "string",
+      "required": true
+    },
+    "time": {
+      "type": "date",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

@@ -14,12 +14,12 @@
       "type": "string"
     },
     "id_user": {
-      "type": "string",
+      "type": "number",
       "required": true
     },
     "id_account": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "time": {
       "type": "date",
@@ -34,7 +34,7 @@
       "principalType": "ROLE",
       "principalId": "$everyone",
       "permission": "DENY"
-    },
+    },    
     {
       "accessType": "EXECUTE",
       "principalType": "ROLE",

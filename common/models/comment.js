@@ -1,7 +1,10 @@
+var moment = require('moment');
+var LIMIT_PER_MIN = 2;
+
 module.exports = function(Comment) {
 
 	Comment.remoteMethod(
-    	'getComments',
+    	'commentsByClip',
     	{
     		accepts: [
     					{arg: 'id_clip', type: 'string', required: true},
@@ -13,7 +16,7 @@ module.exports = function(Comment) {
 		}
 	);
 
-	Comment.getComments = function(id_clip, limit, skip, cb) {		
+	Comment.commentsByClip = function(id_clip, limit, skip, cb) {		
 
 		var filter = {where: {id_clip: id_clip}, include: "author", order: "id DESC"};
 
@@ -26,12 +29,16 @@ module.exports = function(Comment) {
 			if(err) cb(err);
 			cb(null, data);
 		});		
+
+		var Visit = Comment.app.models.visit;
+		Visit.recordVisit("commentViewVisit", id_clip+': '+skip);
   	};
 
   	Comment.beforeRemote('create', function(context, comment, next) {
 
 		//Only logged-in user can call this function, so userID is always available
 		var userID = context.req.accessToken && context.req.accessToken.userId;
+		var accountID = context.args.data.id_account;
 
 		Comment.app.models.client.findById(userID)
 		.then(function(user) {
@@ -40,43 +47,50 @@ module.exports = function(Comment) {
 				err.status = 801;
 		      	throw err;
 		    }
-
-			return Comment.app.models.account.find({where: {id_user: userID, type: "comment"}});
+			return Comment.app.models.account.findById(accountID);
 		})
-		.then(function(accounts) {
+		.then(function(account) {
 
-			if(accounts.length == 0) {
+			if(!account) {
 				var err = new Error('Comment account not exists');
 				err.status = 401;
 		      	throw err;
-			}
+			}else{
+				return true;	
+			}			
+		})
+		.then(function() {
 
-			context.args.data.id_account = accounts[0].id;
-			context.args.data.time = Date.now();				    
-			next();
+			var min = moment().subtract(1, 'minutes').format("YYYY-MM-DD HH:mm:ss");
+		    var max = moment().format("YYYY-MM-DD HH:mm:ss");
+		    		    
+			var where = {
+						   and: [
+						     { id_user: userID },					     
+						     { time: { between: [min, max] } }
+						   ]
+						};
+
+			return Comment.count(where);
+		})
+		.then(function(data) {			
+
+			if(data >= LIMIT_PER_MIN) {
+				var Visit = Comment.app.models.visit;
+				Visit.recordVisit("commentExceedLimit", "");
+
+				var err = new Error('Exceed limit');
+				err.status = 805;
+		    	throw err;
+			}else{
+				context.args.data.id_user = userID;
+				context.args.data.time = Date.now();				    
+				next();
+			}			
 		})	
 		.catch(function(err){
 			return next(err);
 		});
-
-		// Comment.app.models.client.findById(userID, function(err, user) { 
-		// 	if (err) {
-		//       	return next(err);
-		//     }		    
-
-		//     if (user.locked) {
-		//     	var err = new Error('User disabled');
-		// 		err.status = 801;
-		//       	return next(err);
-		//     }
-
-		//     Comment.app.models.account.find({where: {id_user: userId, type: "comment"}}, function(err, user) {
-						    
-		// 	    context.args.data.id_account = user[0].id;
-		// 		context.args.data.time = Date.now();				    
-		// 	    next();
-		// 	});
-		// });		
 	});
 
  //  	Comment.beforeRemote('create', function(context, comment, next) {

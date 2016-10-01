@@ -5,7 +5,10 @@ module.exports = function(Post) {
 	Post.remoteMethod(
     	'getCommentQty',
     	{
-    		accepts: {arg: 'id_post', type: 'string', required: true},
+    		accepts: [
+    					{arg: 'id_post', type: 'string', required: true},
+    					{arg: 'isRefresh', type: 'boolean', required: true},
+    				 ],
       		http: {path: '/getCommentQty', verb: 'post'},
 		    returns: {arg: 'commentQtyList', type: 'array'}
 		}
@@ -14,7 +17,10 @@ module.exports = function(Post) {
 	Post.remoteMethod(
     	'getCommentQtyByClips',
     	{
-    		accepts: {arg: 'clips', type: 'array', required: true},
+    		accepts: [
+    					{arg: 'clips', type: 'array', required: true},
+    					{arg: 'isRefresh', type: 'boolean', required: true},
+    			     ],
       		http: {path: '/getCommentQtyByClips', verb: 'post'},
 		    returns: {arg: 'commentQtyList', type: 'array'}
 		}
@@ -29,7 +35,7 @@ module.exports = function(Post) {
 		}
 	);
 	
-	Post.getCommentQty = function(id_post, cb) {		
+	Post.getCommentQty = function(id_post, isRefresh, cb) {
 				
 		var dataSource = Post.app.datasources.accountDS;		
 
@@ -41,14 +47,19 @@ module.exports = function(Post) {
 				     "group by post.id_post, post.id_clip, post.id";
 
 		dataSource.connector.execute(string, null, function(err, result){			
-			if(err) return cb(err);			
+			if(err) return cb(err);
 			cb(null, result);
-		}); 
+		});
+
+		if(!isRefresh) {
+			var Visit = Post.app.models.visit;
+			Visit.recordVisit("PostVisit", id_post);
+		}
   	};
 
-  	Post.getCommentQtyByClips = function(clips, cb) {		
-
-  		var ids_post = '';
+  	Post.getCommentQtyByClips = function(clips, isRefresh, cb) {	
+  		
+		var ids_post = '';
 
   		for(i in clips) {  		   			
   			ids_post += '"' + clips[i] + '",';  			
@@ -68,7 +79,12 @@ module.exports = function(Post) {
 		dataSource.connector.execute(string, null, function(err, result){			
 			if(err) return cb(err);			
 			cb(null, result);
-		}); 
+		});
+
+		if(!isRefresh) {
+			var Visit = Post.app.models.visit;
+			Visit.recordVisit("FavoriteVisit", "");
+		}		
   	};
 
   	Post.updatePostClip = function(postData, cb) {

@@ -22,7 +22,15 @@
     "locked": {
       "type": "boolean",
       "default": false
-    }
+    },
+    "realm": false,
+    "username": false,
+    "credentials": false,
+    "challenges": false,
+    "emailVerified": false,
+    "verificationToken": false,
+    "status": false,
+    "lastUpdated": false
   },
   "validations": [],
   "relations": {},

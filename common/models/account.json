@@ -1,11 +1,22 @@
 {
   "name": "account",
   "base": "PersistedModel",
-  "idInjection": true,
+  "idInjection": false,
   "options": {
     "validateUpsert": true
   },
+  "scope": {
+    "fields": [
+      "name",
+      "avatar",
+      "id"
+    ]
+  },
   "properties": {
+    "id": {
+      "type": "string",
+      "id": true
+    },
     "id_user": {
       "type": "number",
       "required": true
@@ -30,14 +41,15 @@
       "type": "string",
       "required": false,
       "default": "http://ww3.sinaimg.cn/mw690/006p1Rrsgw1f660b2nbo3j306y06yt8r.jpg"
+    },
+    "created": {
+      "type": "date",
+      "required": true
+    },
+    "lastUpdated": {
+      "type": "date",
+      "required": true
     }
-  },
-  "scope": {
-    "fields": [
-      "name",
-      "avatar",
-      "id"
-    ]
   },
   "validations": [],
   "relations": {},
