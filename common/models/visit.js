@@ -1,7 +1,7 @@
 var moment = require('moment');
 var LoopBackContext = require('loopback-context');
 
-var DAILY_LIMIT = 4;
+var DAILY_LIMIT = 14;
 var TYPE = {
 	shareClip: "shareClip",
 	slowPlay: "slowPlay",
