@@ -1,5 +1,6 @@
-var moment = require('moment');
 var LoopBackContext = require('loopback-context');
+var moment = require('moment');
+var request = require('request');
 
 var DAILY_LIMIT = 14;
 var TYPE = {
@@ -140,9 +141,17 @@ module.exports = function(Visit) {
 
 		var userID = getCurrentUserId();
 
-		if(!userID || !id_clip || !id_post) {
+		if(!userID) {
 			if(cb) cb(false);
 		}
+
+		Visit.app.models.client.findById(userID)
+		.then(function(user) {			
+			recordFavoriteInCouchBase(user.uuid, id_clip);
+		})
+		.catch(function(e){
+			
+		});
 
 		var newFavorite = {
 			id_user: userID,
@@ -193,6 +202,62 @@ module.exports = function(Visit) {
 			if(cb) cb(err);
 		});
 	};
+
+	function recordFavoriteInCouchBase(uuid, id_clip) {
+
+		var serverURL = 'http://121.40.197.226:8000/cliplay_user_data/';
+		var docID = 'favorite_' + uuid;
+		var owner = "user_" + uuid;
+		var uri = serverURL + docID;
+		var auth = {
+			    		'user': 'cliplay_user',
+			    		'pass': 'Cliplay_nba'			   
+				   };
+
+		request({
+		    method: 'GET',
+		    uri: uri,
+		    auth: auth},
+		  	function (error, response, body) {
+		    	if (error) {
+		      		return console.error('upload failed:', error);
+		    	}else{
+
+		   			var favorite = JSON.parse(body);
+		   			var clips = favorite.clips;
+
+		   			if(favorite.error && favorite.error == 'not_found') {
+		   				favorite = {
+		   					_id: docID,
+							owner: owner,
+		   					title: "我的最爱",
+		   					clips: [id_clip],
+		   					type: "favorite"
+		   				};
+		   			}else {
+		   				clips.unshift(id_clip);
+		   			}
+
+		    		request({
+					    method: 'PUT',
+					    uri: uri,
+					    multipart: [
+						    {
+						    	'content-type': 'application/json',
+						        body: JSON.stringify(favorite)						  
+						    }
+					    ],
+					    auth: auth},
+					  	function (error, response, body) {
+					    	if (error) {
+					      		return console.error('upload failed:', error);
+					    	}
+						}
+					);
+		    	}
+			}
+		);
+	}
 
   	function getCurrentUserId() {
 	    var ctx = LoopBackContext.getCurrentContext();

@@ -11,7 +11,8 @@
       "avatar",
       "id",
       "password",
-      "locked"
+      "locked",
+      "uuid"
     ]
   },
   "properties": {
