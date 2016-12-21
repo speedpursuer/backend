@@ -52,5 +52,9 @@
   "favorite": {
     "dataSource": "accountDS",
     "public": true
+  },
+  "api": {
+    "dataSource": null,
+    "public": true
   }
 }

@@ -3,11 +3,7 @@ var request = require('request');
 module.exports = function(Favorite) {
 	Favorite.remoteMethod(
     	'convertSQLtoCouch',
-    	{
-    		// accepts: [
-    		// 			{arg: 'id_post', type: 'string', required: true},
-    		// 			{arg: 'isRefresh', type: 'boolean', required: true},
-    		// 		 ],
+    	{    		
       		http: {path: '/convertSQLtoCouch', verb: 'post'},
 		    returns: {arg: 'result', type: 'boolean'}
 		}
@@ -15,11 +11,7 @@ module.exports = function(Favorite) {
 
 	Favorite.remoteMethod(
     	'test',
-    	{
-    		// accepts: [
-    		// 			{arg: 'id_post', type: 'string', required: true},
-    		// 			{arg: 'isRefresh', type: 'boolean', required: true},
-    		// 		 ],
+    	{    		
       		http: {path: '/test', verb: 'post'},
 		    returns: {arg: 'result', type: 'boolean'}
 		}
@@ -27,11 +19,7 @@ module.exports = function(Favorite) {
 
 	Favorite.remoteMethod(
     	'remove',
-    	{
-    		// accepts: [
-    		// 			{arg: 'id_post', type: 'string', required: true},
-    		// 			{arg: 'isRefresh', type: 'boolean', required: true},
-    		// 		 ],
+    	{    		
       		http: {path: '/remove', verb: 'post'},
 		    returns: {arg: 'result', type: 'boolean'}
 		}

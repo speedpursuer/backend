@@ -58,7 +58,7 @@ module.exports = function(Post) {
   	};
 
   	Post.getCommentQtyByClips = function(clips, isRefresh, cb) {	
-  		
+
 		var ids_post = '';
 
   		for(i in clips) {  		   			
@@ -69,12 +69,10 @@ module.exports = function(Post) {
 						
 		var dataSource = Post.app.datasources.accountDS;		
 
-		var string = "SELECT post.id_clip, count(comment.id) as comment_quantity " +
-					 "FROM post " +
-					 "LEFT JOIN comment " +
-					 "ON post.id_clip = comment.id_clip " +
-					 'where post.id_clip in (' + ids_post + ') ' +
-				     "group by post.id_post, post.id_clip, post.id";
+		var string = "SELECT id_clip, count(comment.id) as comment_quantity " +
+					 "FROM comment " +					 
+					 'where id_clip in (' + ids_post + ') ' +
+				     "group by id_clip";
 
 		dataSource.connector.execute(string, null, function(err, result){			
 			if(err) return cb(err);			
