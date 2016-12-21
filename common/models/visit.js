@@ -7,6 +7,7 @@ var TYPE = {
 	shareClip: "shareClip",
 	slowPlay: "slowPlay",
 	appStart: "appStart",
+	appInstall: "appInstall",
 };
 
 module.exports = function(Visit) {
@@ -60,6 +61,15 @@ module.exports = function(Visit) {
     	'recordAppStart',
     	{
       		http: {path: '/recordAppStart', verb: 'post'},
+		    returns: {arg: 'result', type: 'boolean'}
+		}
+	);
+
+	Visit.remoteMethod(
+    	'recordAppInstall',
+    	{
+    		accepts: {arg: 'appInfo', type: 'string', required: true}, 		
+      		http: {path: '/recordAppInstall', verb: 'post'},
 		    returns: {arg: 'result', type: 'boolean'}
 		}
 	);
@@ -195,6 +205,23 @@ module.exports = function(Visit) {
 		}
 
 		saveVisit(TYPE.appStart, "", userID, "")
+		.then(function(){		
+			if(cb) cb(null, true);
+		})
+		.catch(function(err){
+			if(cb) cb(err);
+		});
+	};
+
+	Visit.recordAppInstall = function(appInfo, cb) {
+
+		var userID = getCurrentUserId();
+
+		if(!userID) {
+			if(cb) cb(false);
+		}
+
+		saveVisit(TYPE.appInstall, appInfo, userID, "")
 		.then(function(){		
 			if(cb) cb(null, true);
 		})
