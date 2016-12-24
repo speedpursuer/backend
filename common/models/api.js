@@ -39,7 +39,7 @@ module.exports = function(Api) {
 		    	if (error) {
 		    		return cb(error);		      		
 		    	}else{
-		    		var content = JSON.parse(body);
+		    		var content = JSON.parse(body);		    		
 		    		var images = content.images;
 		    		var title = content.title;
 		    		var result = [];
@@ -47,23 +47,13 @@ module.exports = function(Api) {
 		    		for(i in images) {
 		    			var src = images[i].src;
 
-		    			console.error('src = ', src);
+		    			// console.error('src = ', src);	
 
-		    			if(src.indexOf('.gif') !== -1) {
-		    				// if(endsWith(src, 'gif')){
-		    				// 	result.push(src);
-		    				// }else{
-		    				// 	var position = src.indexOf('gif');		
-			    			// 	var newSrc = src.substr(0, position)+'gif';  
-			    			// 	result.push(newSrc);				
-		    				// }
-		    				// if(src.indexOf('user') !== -1) {
-		    				// 	continue;
-		    				// }
-		    				var position = src.indexOf('.gif');		
-			    			var newSrc = src.substr(0, position)+'.gif';  
-			    			result.push(newSrc);				
-		    			}
+						if(!isValidSrc(src)) {
+							continue;
+						}
+
+						result.push(src);		    	
 		    		}
 		    		// cb(null, result, title);
 		    		cb(null, result, "多图下载");
@@ -74,6 +64,18 @@ module.exports = function(Api) {
 		var Visit = Api.app.models.visit;
 		Visit.recordVisit("fetch_clips", url);
   	};
+
+  	function isValidSrc(src) {
+  		// if(src.indexOf('gif') !== -1) {
+		// 	var position = src.indexOf('gif');		
+		// 	var newSrc = src.substr(0, position)+'gif';  
+		// 	result.push(newSrc);		
+		// }
+		if(src.indexOf('icon') !== -1) {
+			return false;
+		}
+  		return true;
+  	}
 
   	function getCurrentUserId() {
 	    var ctx = LoopBackContext.getCurrentContext();
