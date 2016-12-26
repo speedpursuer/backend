@@ -74,6 +74,11 @@ module.exports = function(Api) {
 		if(src.indexOf('icon') !== -1) {
 			return false;
 		}
+
+		if(src.indexOf('user') !== -1) {
+			return false;
+		}
+
   		return true;
   	}
 
