@@ -56,7 +56,7 @@ module.exports = function(Api) {
 						result.push(src);		    	
 		    		}
 		    		// cb(null, result, title);
-		    		cb(null, result, "多图下载");
+		    		cb(null, result, "");
 		    	}
 			}
 		);

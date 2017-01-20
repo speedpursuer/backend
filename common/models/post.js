@@ -27,6 +27,19 @@ module.exports = function(Post) {
 	);
 
 	Post.remoteMethod(
+    	'getCommentQtyByClipsV2',
+    	{
+    		accepts: [
+    					{arg: 'clips', type: 'array', required: true},
+    					{arg: 'isRefresh', type: 'boolean', required: true},
+    					{arg: 'title', type: 'string', required: true},
+    			     ],
+      		http: {path: '/getCommentQtyByClipsV2', verb: 'post'},
+		    returns: {arg: 'commentQtyList', type: 'array'}
+		}
+	);
+
+	Post.remoteMethod(
     	'updatePostClip',
     	{
     		accepts: {arg: 'postData', type: 'array', required: true},
@@ -82,6 +95,34 @@ module.exports = function(Post) {
 		if(!isRefresh) {
 			var Visit = Post.app.models.visit;
 			Visit.recordVisit("FavoriteVisit", "");
+		}		
+  	};
+
+  	Post.getCommentQtyByClipsV2 = function(clips, isRefresh, title, cb) {	
+
+		var ids_post = '';
+
+  		for(i in clips) {  		   			
+  			ids_post += '"' + clips[i] + '",';  			
+  		}
+
+  		ids_post = ids_post.substring(0, ids_post.length - 1);
+						
+		var dataSource = Post.app.datasources.accountDS;		
+
+		var string = "SELECT id_clip, count(comment.id) as comment_quantity " +
+					 "FROM comment " +					 
+					 'where id_clip in (' + ids_post + ') ' +
+				     "group by id_clip";
+
+		dataSource.connector.execute(string, null, function(err, result){			
+			if(err) return cb(err);			
+			cb(null, result);
+		});
+
+		if(!isRefresh) {
+			var Visit = Post.app.models.visit;
+			Visit.recordVisit("FavoriteVisit", title);
 		}		
   	};
 
