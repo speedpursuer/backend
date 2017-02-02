@@ -55,8 +55,8 @@ module.exports = function(Api) {
 
 						result.push(src);		    	
 		    		}
-		    		// cb(null, result, title);
-		    		cb(null, result, "");
+		    		cb(null, result, title.substring(0, 15));
+		    		// cb(null, result, "");
 		    	}
 			}
 		);
